@@ -29,15 +29,33 @@ export function useMap() {
 
   function createMarker(
     position: google.maps.LatLngLiteral | google.maps.LatLng,
-    map: google.maps.Map
+    map: google.maps.Map,
+    onClick?: string | Element | Text
   ) {
     const marker = new google.maps.Marker({
       position,
       map,
     })
+    if (onClick) {
+      const infowindow = createInfoWindows(onClick)
+      marker.addListener('click', () => {
+        console.log('onclock')
+        infowindow.open({
+          anchor: marker,
+          map,
+          shouldFocus: false,
+        })
+      })
+    }
 
     return marker
   }
 
-  return { createMap, createMarker }
+  function createInfoWindows(content: string | Element | Text) {
+    return new google.maps.InfoWindow({
+      content,
+    })
+  }
+
+  return { createMap, createMarker, createInfoWindows }
 }
