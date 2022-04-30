@@ -7,8 +7,8 @@ import Header from 'components/Header'
 function App() {
   return (
     <BrowserRouter>
-      <Header />
       <Root>
+        <Header />
         <Routes>
           <Route path={'/'} element={<Home />} />
         </Routes>

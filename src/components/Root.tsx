@@ -3,5 +3,5 @@ type Props = {
 }
 
 export default function Root({ children }: Props) {
-  return <div className="mx-16 h-auto w-auto flex items-center justify-center my-8">{children}</div>
+  return <div className=" h-screen w-screen flex items-center justify-center flex-col">{children}</div>
 }
