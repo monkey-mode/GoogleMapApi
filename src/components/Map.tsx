@@ -1,94 +1,43 @@
 import { useMap } from 'hook/useMap'
 import { useEffect, useState } from 'react'
 import { Popconfirm, Button } from 'antd'
+import { userA } from 'mockData/user'
+import { user } from 'types'
 
 function Map() {
   const { createMap, createInfoWindows, createMarker } = useMap()
-  let markers: google.maps.Marker[] = []
+  const [showSide, setShowSide] = useState(false)
+  const markers: google.maps.Marker[] = []
 
-  async function initMap() {
-    document.getElementById('show-markers')?.addEventListener('click', showMarkers)
-    document.getElementById('hide-markers')?.addEventListener('click', hideMarkers)
-    document.getElementById('delete-markers')?.addEventListener('click', deleteMarkers)
-
-    const contentString = (
-      `<div>
-        งานหีหมา
-        <div class=" text-3xl">content</div>
-        <button>ปุ่มตกลง</button>
-        <button>ปุ่มยกเลิก</button>
-        <input type="text" class="border-2 border-black"></input>
-      </div>`
-    )
-
+  async function initMap(_user: user) {
     const map = await createMap(document.getElementById('map') as HTMLElement)
-    map.addListener('click', async (event: google.maps.MapMouseEvent) => {
-      const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
-      console.log(event.latLng?.lat(), event.latLng?.lng())
-      markers.push(createMarker(location, map, contentString))
-      showPopconfirm()
-    })
-
-    function setMapOnAll(map: google.maps.Map | null) {
-      for (let i = 0; i < markers.length; i++) {
-        markers[i].setMap(map)
-      }
+    // map.addListener('click', async (event: google.maps.MapMouseEvent) => {
+    //   const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
+    //   console.log(event.latLng?.lat(), event.latLng?.lng())
+    //   map.panTo(location)
+    //   markers.push(createMarker(location, map))
+    //   showPopconfirm()
+    // })
+    const { name, img, picMarker } = _user
+    for (let i = 0; i < picMarker.length; i++) {
+      const { lat, lng } = picMarker[i]
+      const location = { lat, lng } as google.maps.LatLngLiteral
+      markers.push(createMarker(location, map))
     }
-
-    function hideMarkers(): void {
-      setMapOnAll(null)
-    }
-
-    function showMarkers(): void {
-      setMapOnAll(map)
-    }
-
-    function deleteMarkers(): void {
-      hideMarkers()
-      markers = []
-    }
-  }
-  const [visible, setVisible] = useState(false)
-  const [confirmLoading, setConfirmLoading] = useState(false)
-
-  const showPopconfirm = () => {
-    setVisible(true)
-  }
-
-  const handleOk = () => {
-    setConfirmLoading(true)
-    setTimeout(() => {
-      setVisible(false)
-      setConfirmLoading(false)
-    }, 2000)
-  }
-
-  const handleCancel = () => {
-    console.log('Clicked cancel button')
-    setVisible(false)
+    const { lat, lng } = picMarker[0]
+    const location = { lat, lng } as google.maps.LatLngLiteral
+    map.panTo(location)
   }
   useEffect(() => {
-    initMap()
+    initMap(userA)
   }, [])
 
   return (
     <>
-      <div></div>
-      <div id="map" className=" h-5/6"></div>
-      <input id="hide-markers" type="button" value="Hide Markers" />
-      <input id="show-markers" type="button" value="Show Markers" />
-      <input id="delete-markers" type="button" value="Delete Markers" />
-      {/* <Popconfirm
-        title="Title"
-        visible={visible}
-        onConfirm={handleOk}
-        okButtonProps={{ loading: confirmLoading }}
-        onCancel={handleCancel}
-      >
-        <Button type="primary" onClick={showPopconfirm}>
-          Open Popconfirm with async logic
-        </Button>
-      </Popconfirm> */}
+      <div className="absolute z-10 top-0 bg-white shadow-lg shadow-black w-96 h-full flex-col">
+        <img src={userA.picMarker[0].image[0]} className=" w-full h-auto"></img>
+      </div>
+      <div id="map" className=" h-full w-full"></div>
     </>
   )
 }

@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Root>
-        <Header />
+        {/* <Header /> */}
         <Routes>
           <Route path={'/'} element={<Home />} />
         </Routes>

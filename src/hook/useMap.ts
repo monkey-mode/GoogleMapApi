@@ -1,4 +1,5 @@
 import { Loader } from '@googlemaps/js-api-loader'
+import { lightMapStyle } from 'consts/map'
 
 export const loader = new Loader({
   apiKey: 'AIzaSyDdcVw5eaH-fXnyhGsC1RohV_s0qk_ex7c',
@@ -13,11 +14,12 @@ export function useMap() {
     const google = await loader.load()
     const map = new google.maps.Map(element, {
       zoom: 18,
-      mapTypeId: 'roadmap',
+      mapTypeId: 'terrain',
       center: { lat: 13.736717, lng: 100.523186 },
       disableDefaultUI: true,
       keyboardShortcuts: false,
       clickableIcons: false,
+      styles: lightMapStyle,
     })
     return map
   }
