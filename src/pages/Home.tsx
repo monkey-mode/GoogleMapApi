@@ -1,14 +1,20 @@
-import React from 'react'
-import Map from 'components/Map'
+import { Row, Card, Container, Spacer } from '@nextui-org/react'
+import Body from 'components/Body'
+import Header from 'components/Header'
 
 function Home() {
   return (
-    <div className="w-full h-full">
-      <Map />
-    </div>
+    <Container md>
+      <Spacer y={2} />
+      <Card>
+        <Header></Header>
+        <Card.Divider></Card.Divider>
+        <Body></Body>
+        <Card.Divider></Card.Divider>
+        <Card.Footer></Card.Footer>
+      </Card>
+    </Container>
   )
 }
 
 export default Home
-
-

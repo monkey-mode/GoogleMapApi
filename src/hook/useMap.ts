@@ -1,8 +1,9 @@
 import { Loader } from '@googlemaps/js-api-loader'
-import { lightMapStyle } from 'consts/map'
+import { lightMapStyle, darkMapStyle } from 'consts/map'
+import { useTheme } from '@nextui-org/react'
 
 export const loader = new Loader({
-  apiKey: 'AIzaSyDdcVw5eaH-fXnyhGsC1RohV_s0qk_ex7c',
+  apiKey: 'AIzaSyBhn-5MT9GLGn2VJTN33fgVStXzMb9ZuN8',
   region: 'TH',
   language: 'th',
   version: 'weekly',
@@ -10,6 +11,8 @@ export const loader = new Loader({
 })
 
 export function useMap() {
+  const { isDark } = useTheme()
+
   async function createMap(element: HTMLElement) {
     const google = await loader.load()
     const map = new google.maps.Map(element, {
@@ -19,7 +22,7 @@ export function useMap() {
       disableDefaultUI: true,
       keyboardShortcuts: false,
       clickableIcons: false,
-      styles: lightMapStyle,
+      styles: isDark ? darkMapStyle : lightMapStyle,
     })
     return map
   }

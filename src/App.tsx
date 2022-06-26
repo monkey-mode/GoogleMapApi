@@ -1,19 +1,34 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Home from 'pages/Home'
-import Root from 'components/Root'
-import Header from 'components/Header'
+import { createTheme, NextUIProvider } from '@nextui-org/react'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+const lightTheme = createTheme({
+  type: 'light',
+})
+
+const darkTheme = createTheme({
+  type: 'dark',
+})
 
 function App() {
   return (
-    <BrowserRouter>
-      <Root>
-        {/* <Header /> */}
-        <Routes>
-          <Route path={'/'} element={<Home />} />
-        </Routes>
-      </Root>
-    </BrowserRouter>
+    <NextThemesProvider
+      defaultTheme="system"
+      attribute="class"
+      value={{
+        light: lightTheme.className,
+        dark: darkTheme.className,
+      }}
+    >
+      <NextUIProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path={'/'} element={<Home />} />
+          </Routes>
+        </BrowserRouter>
+      </NextUIProvider>
+    </NextThemesProvider>
   )
 }
 
