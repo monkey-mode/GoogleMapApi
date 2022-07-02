@@ -15,7 +15,6 @@ function Home() {
         <Card.Divider></Card.Divider>
         <Card.Footer>
           <ModalMap></ModalMap>
-          <DropZone></DropZone>
         </Card.Footer>
       </Card>
     </Container>

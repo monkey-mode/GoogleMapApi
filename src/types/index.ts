@@ -15,6 +15,6 @@ interface picMarker {
 export interface positionType {
   lat: string
   lng: string
-  img: string[]
+  img: string
   place: string
 }

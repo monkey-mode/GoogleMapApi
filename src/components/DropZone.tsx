@@ -19,7 +19,9 @@ export default function DropZone() {
   return (
     <Dropzone
       style={{ minWidth: '550px' }}
-      config={{ headers: { "content-type": "multipart/form-data", } }}
+      config={{
+        body: { lat: '1234', lng: '4321' },
+      }}
       onChange={updateFiles}
       footer={false}
       minHeight="195px"
@@ -28,7 +30,7 @@ export default function DropZone() {
       maxFiles={5}
       maxFileSize={2998000}
       accept=".png,image/*"
-      fakeUploading
+      url="http://localhost:8080/create"
       disableScroll
     >
       {files.map((file) => (
@@ -48,8 +50,6 @@ export default function DropZone() {
         openImage={imageSrc ? true : false}
         onClose={(e: any) => handleSee('')}
       />
-
-      
     </Dropzone>
   )
 }

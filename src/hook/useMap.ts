@@ -30,8 +30,8 @@ export function useMap() {
   function createMarker(
     position: google.maps.LatLngLiteral | google.maps.LatLng,
     map: google.maps.Map,
-    img?: string[],
-    onClick?: (lat: string, lng: string, img: string[], place: string) => void,
+    img?: string,
+    onClick?: (lat: string, lng: string, img: string, place: string) => void,
   ) {
     const marker = new google.maps.Marker({
       position,

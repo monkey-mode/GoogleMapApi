@@ -553,6 +553,6 @@ export const darkMapStyle = [
 export const defaultPin = {
   lat: '0',
   lng: '0',
-  img: [''],
+  img: '',
   place: '',
 }

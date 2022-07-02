@@ -25,27 +25,26 @@ function Body() {
     <Card.Body>
       <Grid.Container gap={2} justify="center">
         <Grid sm={3}>
-          <Card isHoverable css={{ height: '400', background: '$background' }}>
+          <Card isHoverable css={{ height: '600', background: '$background' }}>
             <Card.Body>
               <Image
                 width={320}
                 height={180}
-                src={`${position.img[0]}`}
+                src={`${position.img}`}
                 alt="Default Image"
                 objectFit="cover"
               />
               <Text h6>{position.place}</Text>
-              <input type="file" onChange={(e) => {upload(e.target.files)}}></input>
             </Card.Body>
           </Card>
         </Grid>
-        <Grid sm={9}>
+        <Grid sm={9} css={{ minWidth: '400px' }}>
           <Map
             onClickPin={(lat, lng, img, place) => {
               setPosition({ lat, lng, img, place })
               console.log(lat, lng, place, 'return onclick')
             }}
-            onClickMap={(lat: string, lng: string, img: string[], place: string) => {}}
+            onClickMap={(lat: string, lng: string, img: string, place: string) => {}}
           ></Map>
         </Grid>
       </Grid.Container>

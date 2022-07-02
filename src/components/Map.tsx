@@ -7,8 +7,8 @@ import { Card, Col, useTheme, Text, Row, Button } from '@nextui-org/react'
 import axios from 'axios'
 
 type Props = {
-  onClickPin: (lat: string, lng: string, img: string[], place: string) => void
-  onClickMap: (lat: string, lng: string, img: string[], place: string) => void
+  onClickPin: (lat: string, lng: string, img: string, place: string) => void
+  onClickMap: (lat: string, lng: string, img: string, place: string) => void
 }
 
 function Map({ onClickPin, onClickMap }: Props) {
@@ -18,27 +18,35 @@ function Map({ onClickPin, onClickMap }: Props) {
   const markers: google.maps.Marker[] = []
 
   async function initMap(_user: user) {
+    const { data } = await axios.get<
+      { latitude: string; longitude: string; image: string }[]
+    >('http://159.223.2.234:8085/getimage')
+    console.log(data)
     const mapDiv = document.getElementById('map') as HTMLElement
     const map = await createMap(mapDiv)
 
-    map.addListener('click', async (event: google.maps.MapMouseEvent) => {
-      const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
-      console.log(event.latLng?.lat(), event.latLng?.lng())
-      map.panTo(location)
-      createMarker(location, map)
-    })
+    // map.addListener('click', async (event: google.maps.MapMouseEvent) => {
+    //   const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
+    //   console.log(event.latLng?.lat(), event.latLng?.lng())
+    //   map.panTo(location)
+    //   createMarker(location, map)
+    // })
 
-    // const { picMarker } = _user
-    // for (let i = 0; i < picMarker.length; i++) {
-    //   const { lat, lng, image } = picMarker[i]
-    //   const location = { lat, lng } as google.maps.LatLngLiteral
-    //   markers.push(createMarker(location, map, image, onClickPin))
-    // }
-    // const { lat, lng } = picMarker[0]
-    // const location = { lat, lng } as google.maps.LatLngLiteral
-    // map.panTo(location)
-
-   
+    for (let i = 0; i < data.length; i++) {
+      const { latitude, longitude, image } = data[i]
+      const location = {
+        lat: Number(latitude),
+        lng: Number(longitude),
+      } as google.maps.LatLngLiteral
+      markers.push(
+        createMarker(
+          location,
+          map,
+          `https://storage.googleapis.com/projectbucketmap/${image}`,
+          onClickPin
+        )
+      )
+    }
   }
   useEffect(() => {
     initMap(userA)
