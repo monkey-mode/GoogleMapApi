@@ -32,5 +32,12 @@ export const userA: user = {
       lat: 13.729423252496737,
       lng: 100.53201761716046,
     },
+    {
+      index: 5,
+      image: ['/YEEEM-5.png', '/TEEM-1.png', '/YEEEM-2.png', '/BEEEM-2.png'],
+      name: 'วัดกระดิ่ง',
+      lat: 13.725423252496737,
+      lng: 100.53101761716046,
+    },
   ],
 }

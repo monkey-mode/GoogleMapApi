@@ -27,29 +27,27 @@ export function useMap() {
     return map
   }
 
-  async function getGeoLocation(request: google.maps.GeocoderRequest) {
-    const google = await loader.load()
-    const geocoder = new google.maps.Geocoder()
-  }
-
   function createMarker(
     position: google.maps.LatLngLiteral | google.maps.LatLng,
     map: google.maps.Map,
-    onClick?: string | Element | Text
+    img?: string[],
+    onClick?: (lat: string, lng: string, img: string[], place: string) => void,
   ) {
     const marker = new google.maps.Marker({
       position,
       map,
     })
-    if (onClick) {
-      const infowindow = createInfoWindows(onClick)
-      marker.addListener('click', () => {
-        console.log('onclock')
-        infowindow.open({
-          anchor: marker,
-          map,
-          shouldFocus: false,
-        })
+    if (onClick && img) {
+      // const infowindow = createInfoWindows('onClick')
+      marker.addListener('click', async () => {
+        const place = await getGeoLocation({ location: position })
+        onClick(position.lat.toString(), position.lng.toString(), img, place)
+
+        // infowindow.open({
+        //   anchor: marker,
+        //   map,
+        //   shouldFocus: false,
+        // })
       })
     }
 
@@ -62,5 +60,16 @@ export function useMap() {
     })
   }
 
-  return { createMap, createMarker, createInfoWindows }
+  async function getGeoLocation(request: google.maps.GeocoderRequest) {
+    const google = await loader.load()
+    const geocoder = new google.maps.Geocoder()
+    const { results } = await geocoder.geocode({ ...request, region: 'th' })
+    if (results) {
+      return results[0]['formatted_address']
+    } else {
+      return ''
+    }
+  }
+
+  return { createMap, createMarker, createInfoWindows, getGeoLocation }
 }

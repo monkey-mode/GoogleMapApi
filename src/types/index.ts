@@ -11,3 +11,10 @@ interface picMarker {
   lat: number
   lng: number
 }
+
+export interface positionType {
+  lat: string
+  lng: string
+  img: string[]
+  place: string
+}
