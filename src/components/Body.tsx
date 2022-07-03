@@ -1,5 +1,4 @@
-import { Card, Grid, Image, Text, Textarea } from '@nextui-org/react'
-import axios from 'axios'
+import { Card, Container, Grid, Image, Spacer, Text } from '@nextui-org/react'
 import { defaultPin } from 'consts/map'
 import { useState } from 'react'
 import { positionType } from 'types'
@@ -7,44 +6,54 @@ import Map from './Map'
 
 function Body() {
   const [position, setPosition] = useState<positionType>(defaultPin)
-
-  async function upload(file: FileList | null) {
-    const formData = new FormData()
-    if (file && file.length === 1) {
-      formData.append('image', file[0])
-      formData.append('latitude', 'file[0]')
-      formData.append('longitude', 'file[0]')
-
-      await axios.post('http://159.223.2.234:8085/create', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-    }
-  }
-
   return (
     <Card.Body>
       <Grid.Container gap={2} justify="center">
-        <Grid sm={3}>
-          <Card isHoverable css={{ height: '600', background: '$background' }}>
+        <Grid sm={5}>
+          <Card
+            isHoverable
+            css={{
+              height: '600px',
+              background: '$background',
+            }}
+          >
             <Card.Body>
               <Image
-                width={320}
-                height={180}
-                src={`${position.img}`}
+                objectFit={'cover'}
+                showSkeleton
+                height={600}
+                css={{ minWidth: '350px' }}
+                src={`https://storage.googleapis.com/projectbucketmap/${position.img}`}
+                maxDelay={10000}
                 alt="Default Image"
-                objectFit="cover"
               />
-              <Text h6>{position.place}</Text>
             </Card.Body>
+            <Card.Footer
+              isBlurred
+              css={{
+                position: 'absolute',
+                bgBlur: '#0f111466',
+                borderTop: '$borderWeights$light solid $gray800',
+                bottom: 0,
+                zIndex: 1,
+              }}
+            >
+              <Container fluid>
+                <Spacer y={1} />
+                <Text size={12} weight="bold" transform="uppercase" color="#ffffffAA">
+                  Show Your Beautiful Picture
+                </Text>
+                <Text h5 color="white">
+                  {position.place}
+                </Text>
+                <Spacer y={1} />
+              </Container>
+            </Card.Footer>
           </Card>
         </Grid>
-        <Grid sm={9} css={{ minWidth: '400px' }}>
+        <Grid sm={7}>
           <Map
-            onClickPin={(lat, lng, img, place) => {
-              setPosition({ lat, lng, img, place })
-              console.log(lat, lng, place, 'return onclick')
-            }}
-            onClickMap={(lat: string, lng: string, img: string, place: string) => {}}
+            onClickPin={(lat, lng, img, place) => setPosition({ lat, lng, img, place })}
           ></Map>
         </Grid>
       </Grid.Container>

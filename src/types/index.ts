@@ -18,3 +18,21 @@ export interface positionType {
   img: string
   place: string
 }
+
+export interface DataRespon {
+  latitude: string
+  longitude: string
+  image: string
+}
+
+export interface DataPlace {
+  latitude: string
+  longitude: string
+  image: string
+  place: string
+}
+
+export interface PlaceLocation {
+  latitude: string
+  longitude: string
+}

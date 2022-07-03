@@ -1,61 +1,98 @@
-import { useMap } from 'hook/useMap'
-import { useEffect } from 'react'
-import { userA } from 'mockData/user'
-import { user } from 'types'
-import styled from 'styled-components'
-import { Card, Col, useTheme, Text, Row, Button } from '@nextui-org/react'
+import { Button, Card, Col, Row, useTheme } from '@nextui-org/react'
 import axios from 'axios'
+import { useMap } from 'hook/useMap'
+import { useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { DataRespon, PlaceLocation } from 'types'
+import ModalMap from './Modal'
 
 type Props = {
   onClickPin: (lat: string, lng: string, img: string, place: string) => void
-  onClickMap: (lat: string, lng: string, img: string, place: string) => void
 }
 
-function Map({ onClickPin, onClickMap }: Props) {
-  const { createMap, createMarker } = useMap()
+function Map({ onClickPin }: Props) {
   const { isDark } = useTheme()
+  const { createMap, createMarker, getGeoLocation, createNullMarker } = useMap()
+  const [mark, setMark] = useState<DataRespon[]>([])
+  const [pinIndex, setPinIndex] = useState<{ index: number; maxIndex: number }>({
+    index: 0,
+    maxIndex: 0,
+  })
+  const [isVisable, setIsVisable] = useState(false)
+  const [reload, setReload] = useState(false)
+  const [newMark, setNewMark] = useState<PlaceLocation>({
+    latitude: '',
+    longitude: '',
+  })
+  const [mapData, setMapData] = useState<google.maps.Map>()
 
-  const markers: google.maps.Marker[] = []
-
-  async function initMap(_user: user) {
-    const { data } = await axios.get<
-      { latitude: string; longitude: string; image: string }[]
-    >('http://159.223.2.234:8085/getimage')
-    console.log(data)
+  async function initMap(data: DataRespon[]) {
     const mapDiv = document.getElementById('map') as HTMLElement
-    const map = await createMap(mapDiv)
+    const { latitude: lat, longitude: lng } = data[0]
+    const map = await createMap(mapDiv, { lat: Number(lat), lng: Number(lng) })
+    setMapData(map)
+    let newmark = createNullMarker(map)
+    map.addListener('click', async (event: google.maps.MapMouseEvent) => {
+      const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
+      newmark.setMap(null)
+      newmark = createNullMarker(map, location, () => {
+        setIsVisable(true)
+      })
+      if (event.latLng) {
+        setNewMark({
+          latitude: event.latLng.lat().toString(),
+          longitude: event.latLng.lng().toString(),
+        })
+      }
 
-    // map.addListener('click', async (event: google.maps.MapMouseEvent) => {
-    //   const location = event.latLng ?? ({ lat: 0, lng: 0 } as google.maps.LatLngLiteral)
-    //   console.log(event.latLng?.lat(), event.latLng?.lng())
-    //   map.panTo(location)
-    //   createMarker(location, map)
-    // })
+      map.panTo(location)
+    })
 
-    for (let i = 0; i < data.length; i++) {
-      const { latitude, longitude, image } = data[i]
-      const location = {
+    const markers: google.maps.Marker[] = []
+    if (data.length > 0) {
+      for (let i = 0; i < data.length; i++) {
+        markers.push(
+          createMarker(map, data[i], i, onClickPin, (index) => {
+            setPinIndex({ index, maxIndex: data.length })
+          })
+        )
+      }
+      setMark(data)
+      const { latitude, longitude, image } = data[data.length - 1]
+      const place = await getGeoLocation({
+        location: {
+          lat: Number(latitude),
+          lng: Number(longitude),
+        } as google.maps.LatLngLiteral,
+      })
+      onClickPin(latitude, longitude, image, place)
+      setPinIndex({ index: data.length - 1, maxIndex: data.length })
+      map.setZoom(16)
+      map.panTo({
         lat: Number(latitude),
         lng: Number(longitude),
-      } as google.maps.LatLngLiteral
-      markers.push(
-        createMarker(
-          location,
-          map,
-          `https://storage.googleapis.com/projectbucketmap/${image}`,
-          onClickPin
-        )
-      )
+      } as google.maps.LatLngLiteral)
     }
   }
   useEffect(() => {
-    initMap(userA)
-  }, [isDark])
+    ;(async () => {
+      const { data } = await axios.get<DataRespon[]>('http://159.223.2.234:8085/getimage')
+      initMap(data)
+    })()
+  }, [isDark, reload])
 
   return (
-    <Card css={{ w: '100%', h: '400px' }}>
+    <Card css={{ width: '100%', height: '600px' }}>
+      <ModalMap
+        onClose={(close) => {
+          setReload(!reload)
+          setIsVisable(close)
+        }}
+        isVisable={isVisable}
+        location={newMark}
+      ></ModalMap>
       <Card.Body css={{ p: 0 }}>
-        <MapDiv id="map"></MapDiv>
+        <MapDiv style={{ minWidth: '400px' }} id="map"></MapDiv>
       </Card.Body>
       <Card.Footer
         isBlurred
@@ -69,12 +106,53 @@ function Map({ onClickPin, onClickMap }: Props) {
       >
         <Row>
           <Col>
-            <Row justify="flex-end">
-              <Button flat auto rounded>
-                <Text size={12} weight="bold" transform="uppercase">
-                  Get App
-                </Text>
-              </Button>
+            <Row justify="flex-start">
+              <Button.Group color="secondary" bordered>
+                <Button
+                  icon={<span className="material-symbols-rounded">arrow_back_ios</span>}
+                  disabled={pinIndex.index == 0}
+                  onClick={async () => {
+                    const newIndex = pinIndex.index - 1
+                    const { latitude, longitude, image } = mark[newIndex]
+                    const location = {
+                      lat: Number(latitude),
+                      lng: Number(longitude),
+                    } as google.maps.LatLngLiteral
+                    const place = await getGeoLocation({
+                      location,
+                    })
+                    onClickPin(latitude, longitude, image, place)
+                    setPinIndex({ ...pinIndex, index: newIndex })
+                    mapData?.setZoom(16)
+                    mapData?.panTo(location)
+                  }}
+                >
+                  Prev
+                </Button>
+                <Button
+                  disabled={pinIndex.index == pinIndex.maxIndex - 1}
+                  iconRight={
+                    <span className="material-symbols-rounded">arrow_forward_ios</span>
+                  }
+                  onClick={async () => {
+                    const newIndex = pinIndex.index + 1
+                    const { latitude, longitude, image } = mark[newIndex]
+                    const location = {
+                      lat: Number(latitude),
+                      lng: Number(longitude),
+                    } as google.maps.LatLngLiteral
+                    const place = await getGeoLocation({
+                      location,
+                    })
+                    onClickPin(latitude, longitude, image, place)
+                    setPinIndex({ ...pinIndex, index: newIndex })
+                    mapData?.setZoom(16)
+                    mapData?.panTo(location)
+                  }}
+                >
+                  Next
+                </Button>
+              </Button.Group>
             </Row>
           </Col>
         </Row>

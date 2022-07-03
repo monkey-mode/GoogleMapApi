@@ -1,10 +1,15 @@
-import { Card, Dropdown, Row, User, Text, Spacer, Switch } from "@nextui-org/react"
-import { MoonIcon, SunIcon } from "icons"
+import {
+  Card,
+  Dropdown,
+  Row, Spacer,
+  Switch, Text, User, useTheme
+} from '@nextui-org/react'
+import { MoonIcon, SunIcon } from 'icons'
 import { useTheme as useNextTheme } from 'next-themes'
-
 
 function Header() {
   const { setTheme } = useNextTheme()
+  const { isDark } = useTheme()
 
   return (
     <Card.Header>
@@ -49,7 +54,7 @@ function Header() {
         </Dropdown>
         <Spacer x={1} />
         <Switch
-          checked={true}
+          checked={isDark}
           size="xl"
           iconOn={<SunIcon filled />}
           iconOff={<MoonIcon filled />}

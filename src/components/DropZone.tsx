@@ -1,55 +1,44 @@
-import { Dropzone, FileItem, FileValidated, FullScreenPreview } from '@dropzone-ui/react'
+import 'filepond/dist/filepond.min.css'
 import { useState } from 'react'
-export default function DropZone() {
-  const [files, setFiles] = useState<FileValidated[]>([])
-  const [imageSrc, setImageSrc] = useState<string>()
-  const updateFiles = (incommingFiles: FileValidated[]) => {
-    console.log('incomming files', incommingFiles)
-    setFiles(incommingFiles)
-  }
-  const onDelete = (id: string | number | undefined) => {
-    setFiles(files.filter((x) => x.id !== id))
-  }
-  const handleSee = (imageSource: string) => {
-    setImageSrc(imageSource)
-  }
-  const handleClean = (files: FileValidated[]) => {
-    console.log('list cleaned', files)
-  }
+import { FilePond, registerPlugin } from 'react-filepond'
+
+import { setOptions } from 'filepond'
+import FilePondPluginFileMetadata from 'filepond-plugin-file-metadata'
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+
+// Register the plugins
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginFileMetadata
+)
+
+type Props = {
+  location: { latitude: string; longitude: string }
+}
+export default function DropZone({ location }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [files, setFiles] = useState<any>([])
+  setOptions({
+    fileMetadataObject: {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    },
+  })
   return (
-    <Dropzone
-      style={{ minWidth: '550px' }}
-      config={{
-        body: { lat: '1234', lng: '4321' },
-      }}
-      onChange={updateFiles}
-      footer={false}
-      minHeight="195px"
-      onClean={handleClean}
-      value={files}
-      maxFiles={5}
-      maxFileSize={2998000}
-      accept=".png,image/*"
-      url="http://localhost:8080/create"
-      disableScroll
-    >
-      {files.map((file) => (
-        <FileItem
-          {...file}
-          key={file.id}
-          onDelete={onDelete}
-          onSee={handleSee}
-          resultOnTooltip
-          preview
-          info
-          hd
-        />
-      ))}
-      <FullScreenPreview
-        imgSource={imageSrc}
-        openImage={imageSrc ? true : false}
-        onClose={(e: any) => handleSee('')}
+    <div className="App">
+      <FilePond
+        files={files}
+        onupdatefiles={(file) => {
+          setFiles(file)
+        }}
+        maxFiles={1}
+        server="http://localhost:8080/create"
+        name="fromUpload"
+        labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
       />
-    </Dropzone>
+    </div>
   )
 }
