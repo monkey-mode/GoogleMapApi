@@ -28,8 +28,7 @@ function Map({ onClickPin }: Props) {
 
   async function initMap(data: DataRespon[]) {
     const mapDiv = document.getElementById('map') as HTMLElement
-    const { latitude: lat, longitude: lng } = data[0]
-    const map = await createMap(mapDiv, { lat: Number(lat), lng: Number(lng) })
+    const map = await createMap(mapDiv)
     setMapData(map)
     let newmark = createNullMarker(map)
     map.addListener('click', async (event: google.maps.MapMouseEvent) => {

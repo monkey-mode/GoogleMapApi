@@ -14,12 +14,12 @@ export const loader = new Loader({
 export function useMap() {
   const { isDark } = useTheme()
 
-  async function createMap(element: HTMLElement, position: google.maps.LatLngLiteral) {
+  async function createMap(element: HTMLElement) {
     const google = await loader.load()
     const map = new google.maps.Map(element, {
       zoom: 15,
       mapTypeId: 'terrain',
-      center: position,
+      center: { lat: 13.736717, lng: 100.523186 },
       disableDefaultUI: true,
       keyboardShortcuts: false,
       clickableIcons: false,
